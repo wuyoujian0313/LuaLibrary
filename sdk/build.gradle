@@ -1,0 +1,59 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.wm.lua'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+        consumerProguardFiles "consumer-rules.pro"
+
+        externalNativeBuild {
+            cmake {
+                //这里一定要配置分别生成的目标文件的文件名
+                targets "lua_static","lua"
+                //配置生成哪些CPU架构的库
+                abiFilters "armeabi-v7a" , "arm64-v8a", "x86_64"
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "DEBUG", "true"
+            minifyEnabled false
+            debuggable true
+            externalNativeBuild {
+                cmake {
+                    //给编译器引入DEBUG宏
+                    cppFlags += "-DDEBUG"
+                    cFlags += "-DDEBUG"
+                }
+            }
+        }
+        release {
+            buildConfigField "boolean", "DEBUG", "false"
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            // 指定cmakelists文件的路径
+            path "src/main/cpp/lua/CMakeLists.txt"
+            version "3.18.1"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+}
